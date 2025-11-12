@@ -63,7 +63,11 @@
               "browserTarget": "BlogAppWeb:build:production"
             },
             "development": {
-              "browserTarget": "BlogAppWeb:build:development"
+              "browserTarget": "BlogAppWeb:build:development",
+              "ssl": true,
+              "sslCert": "localhost.crt",
+              "sslKey": "localhost.key",
+              "port": 4200
             }
           },
           "defaultConfiguration": "development"
