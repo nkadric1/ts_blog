@@ -5,6 +5,7 @@ import { BlogpostsService } from 'src/app/services/blogposts/blogposts.service';
 import { jwtDecode } from 'jwt-decode';
 import { DecodedToken } from 'src/app/models/token.model';
 import { Component, OnInit } from '@angular/core';
+import { environment } from 'src/environments/environment.staging';
 
 @Component({
   selector: 'app-home',
@@ -18,6 +19,8 @@ export class HomeComponent implements OnInit {
   page: number = 1;
 
   private destroy$ = new Subject<void>();
+
+  apiBaseUrl = environment.apiUrl.replace('/api', '');
 
   constructor(private blogPostService: BlogpostsService, private router: Router) { }
 

@@ -1,32 +1,47 @@
-<div class="container pt-5 d-flex flex-wrap gap-5">
-  <div *ngFor="let blog of blogPosts" class="card" style="width: 25rem">
-    <img src="{{ blog.featureImageUrl }}" class="card-img-top" alt="..." />
-    <div class="card-body">
-      <h5 class="card-title">{{ blog.title }}</h5>
-      <p class="card-text">
-        {{ blog.shortDescription }}
-      </p>
-      <a [routerLink]="['/blog', blog.urlHandle]" class="btn btn-primary"
-        >Read More</a
-      >
+<div class="container pt-5">
+  <div class="row g-4">
+    <div class="col-12 col-md-6 col-lg-4" *ngFor="let blog of blogPosts">
+      <div class="card blog-card h-100">
+
+        <img 
+          [src]="apiBaseUrl + blog.featureImageUrl"
+          class="card-img-top"
+          alt="Blog image"
+        />
+
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title">{{ blog.title }}</h5>
+          <p class="card-text">{{ blog.shortDescription }}</p>
+
+          <a
+            [routerLink]="['/blog', blog.urlHandle]"
+            class="btn btn-primary mt-auto"
+          >
+            Read More
+          </a>
+        </div>
+
+      </div>
     </div>
   </div>
 
-  <div class="d-flex container justify-content-between align-items-center mb-4">
+  <!-- Pagination -->
+  <div class="d-flex justify-content-between align-items-center mt-4">
     <button
       (click)="previousPage()"
       type="button"
-      class="nav-link"
+      class="btn btn-outline-primary"
       *ngIf="page !== 1"
     >
       Previous
     </button>
-    <div *ngIf="page === 1">{{ " " }}</div>
+
+    <div *ngIf="page === 1"></div>
 
     <button
       (click)="nextPage()"
       type="button"
-      class="nav-link"
+      class="btn btn-outline-primary"
       *ngIf="pages !== -1"
     >
       Next

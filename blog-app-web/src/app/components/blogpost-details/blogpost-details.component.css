@@ -1,0 +1,11 @@
+.blog-detail-image {
+    width: 100%;
+    max-width: 600px;
+    height: 350px;
+    object-fit: cover;
+    border-radius: 8px;
+    display: block;
+    margin: 0 auto 20px auto;
+  }
+  
+  
