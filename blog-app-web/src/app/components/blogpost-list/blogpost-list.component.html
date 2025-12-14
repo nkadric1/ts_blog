@@ -1,84 +1,103 @@
-<div class="container pt-1">
-  <div>
-    <h1>BlogPost List</h1>
-  </div>
-  <div class="d-flex justify-content-end">
-    <button
-      type="button"
-      class="btn btn-primary"
-      (click)="navigateToAddBlogPost()"
-    >
-      Add BlogPost
-    </button>
-  </div>
-  <div class="container mt-3">
-    <table class="table table-bordered">
-      <thead>
-        <tr>
-          <th scope="col">Title</th>
-          <th scope="col">Short Description</th>
-          <th scope="col">Is Visible</th>
-          <th scope="col">Categories</th>
-          <th scope="col">{{ " " }}</th>
-          <th scope="col">{{ " " }}</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let blogPost of blogPosts">
-          <th scope="row">{{ blogPost.title }}</th>
-          <td>{{ blogPost.shortDescription }}</td>
-          <td>{{ blogPost.isVisible }}</td>
-          <td class="w-25">
-            <ng-container
-              *ngFor="let category of blogPost.categories"
-              class="d-flex flex-wrap gap-1"
-            >
-              <div class="badge rounded-pill bg-light text-dark">
-                {{ category.name }}
+<div class="container page-wrap">
+  <div class="theme-surface admin-card p-3 p-md-4">
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+      <h2 class="page-title m-0">Blog posts</h2>
+
+      <button type="button" class="btn btn-primary" (click)="navigateToAddBlogPost()">
+        + Add blog post
+      </button>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table admin-table align-middle mb-0">
+        <thead class="admin-thead">
+          <tr>
+            <th>Title</th>
+            <th class="d-none d-lg-table-cell">Short description</th>
+            <th>Visible</th>
+            <th style="min-width: 240px;">Categories</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let blogPost of blogPosts" class="admin-row">
+            <td class="fw-semibold">
+              {{ blogPost.title }}
+              <div class="text-muted small d-lg-none mt-1">
+                {{ blogPost.shortDescription }}
               </div>
-              {{ " " }}
-            </ng-container>
-          </td>
-          <td>
-            <a
-              [routerLink]="['/admin/blogposts/edit', blogPost.id]"
-              class="btn btn-light"
-              >Edit</a
-            >
-          </td>
-          <td>
-            <button
-              type="button"
-              (click)="deleteBlogPost(blogPost.id)"
-              class="btn btn-danger"
-            >
-              Delete
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    <div
-      class="d-flex container justify-content-between align-items-center mb-3"
-    >
+            </td>
+
+            <td class="text-muted d-none d-lg-table-cell">
+              {{ blogPost.shortDescription }}
+            </td>
+
+            <td>
+              <span class="status-pill" [class.status-pill--on]="blogPost.isVisible">
+                {{ blogPost.isVisible ? 'Visible' : 'Hidden' }}
+              </span>
+            </td>
+
+            <td>
+              <div class="d-flex flex-wrap gap-1">
+                <span class="chip" *ngFor="let category of blogPost.categories">
+                  {{ category.name }}
+                </span>
+              </div>
+            </td>
+
+            <td class="text-end">
+              <div class="d-inline-flex gap-2" style="white-space: nowrap;">
+                <a
+                  [routerLink]="['/admin/blogposts/edit', blogPost.id]"
+                  class="btn btn-outline-primary btn-sm"
+                >
+                  Edit
+                </a>
+
+                <button
+                  type="button"
+                  class="btn btn-outline-danger btn-sm"
+                  (click)="deleteBlogPost(blogPost.id)"
+                >
+                  Delete
+                </button>
+              </div>
+            </td>
+          </tr>
+
+          <tr *ngIf="blogPosts.length === 0">
+            <td colspan="5" class="text-center text-muted py-4">
+              No blog posts yet.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mt-3">
       <button
         (click)="previousPage()"
         type="button"
-        class="nav-link"
+        class="btn btn-outline-primary"
         *ngIf="page !== 1"
       >
         Previous
       </button>
-      <div *ngIf="page === 1">{{ " " }}</div>
+
+      <div class="text-muted small">Page {{ page }}</div>
 
       <button
         (click)="nextPage()"
         type="button"
-        class="nav-link"
+        class="btn btn-outline-primary"
         *ngIf="pages !== -1"
       >
         Next
       </button>
     </div>
+
   </div>
 </div>

@@ -51,4 +51,8 @@ export class HomeComponent implements OnInit {
     this.destroy$.next();
     this.destroy$.complete();
   }
+  goToProfile(): void {
+  this.router.navigate(['/profile']);
+}
+
 }

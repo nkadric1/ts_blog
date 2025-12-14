@@ -1,1 +1,154 @@
 /* You can add global styles to this file, and also import other style files */
+:root{
+  --bg: #F5EFE6;        
+  --surface: #FFFFFF;    
+  --surface-2: #E8DFCA;  
+  --primary: #6D94C5;     
+  --primary-soft: #CBDCEB;
+
+  --text: #1f2a37;
+  --muted: #667085;
+
+  --border: rgba(31,42,55,.10);
+  --shadow: 0 8px 20px rgba(31,42,55,.08);
+
+  --radius-lg: 16px;
+  --radius-md: 12px;
+}
+
+
+html, body { height: 100%; }
+body{
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+a { color: var(--primary); }
+a:hover { color: #5a84bb; }
+
+/* Base button (shape only) */
+.btn{
+  border-radius: 999px !important;
+  font-weight: 600;
+  padding: .55rem 1.05rem;
+  border-width: 1px;
+  box-shadow: none !important;
+}
+.btn:focus-visible{
+  outline: 3px solid rgba(109,148,197,.28);
+  outline-offset: 2px;
+}
+
+/* Primary = clean filled */
+.btn-primary{
+  background: var(--primary) !important;
+  border-color: var(--primary) !important;
+  color: #fff !important;
+}
+.btn-primary:hover{
+  background: #5f86be !important;
+  border-color: #5f86be !important;
+}
+
+/* Outline primary = soft hover */
+.btn-outline-primary{
+  color: var(--primary) !important;
+  border-color: rgba(109,148,197,.55) !important;
+  background: transparent !important;
+}
+.btn-outline-primary:hover{
+  background: rgba(203,220,235,.65) !important;
+  border-color: rgba(109,148,197,.7) !important;
+  color: #2f4f7d !important;
+}
+
+/* Outline danger = minimalist (bez crvene “kapsule”) */
+.btn-outline-danger{
+  color: #b24b4b !important;
+  border-color: rgba(178,75,75,.55) !important;
+  background: transparent !important;
+}
+.btn-outline-danger:hover{
+  background: rgba(228,106,106,.12) !important;
+  border-color: rgba(178,75,75,.7) !important;
+}
+
+/* Small buttons look nicer in tables */
+.btn-sm{
+  padding: .42rem .85rem;
+  font-weight: 700;
+}
+
+.theme-surface{
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+}
+
+/* cards */
+.blog-card{
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--surface);
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+.blog-card:hover{
+  transform: translateY(-4px);
+  box-shadow: 0 12px 26px rgba(31,42,55,.10);
+}
+
+/* navbar */
+.app-navbar{
+  background: rgba(255,255,255,.65) !important;
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+}
+.app-navbar .nav-link:hover{
+  background: rgba(203,220,235,.55);
+}
+
+/* danger (svjetlije i “clean”) */
+.btn-danger{
+  background: #E46A6A !important;
+  border-color: #E46A6A !important;
+}
+.btn-danger:hover{
+  background: #d85f5f !important;
+  border-color: #d85f5f !important;
+}
+.admin-card{
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.admin-table{
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.admin-thead th{
+  background: transparent;
+  color: var(--muted);
+  font-size: .8rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  border-bottom: 1px solid var(--border);
+  padding: .85rem .75rem;
+}
+
+.admin-row td{
+  padding: .85rem .75rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.admin-row:hover{
+  background: rgba(203,220,235,.35);
+}
+
+.page-wrap{
+    margin-top: 20px;
+}

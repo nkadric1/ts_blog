@@ -1,4 +1,4 @@
-﻿namespace Blog.Models.DTO
+﻿namespace BlogAppAPI.Models.DTO
 {
     public class BlogImageDto
     {

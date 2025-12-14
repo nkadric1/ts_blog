@@ -1,1 +1,69 @@
-<p>comments works!</p>
+<div class="mt-4">
+  <h5 class="mb-3">Comments</h5>
+
+  <div *ngIf="loading">Loading comments...</div>
+
+  <div class="card mb-3" *ngIf="isLoggedIn; else loginHint">
+    <div class="card-body">
+      <form [formGroup]="form" (ngSubmit)="save()">
+        <textarea
+          class="form-control"
+          rows="3"
+          formControlName="content"
+          placeholder="Write a comment..."
+        ></textarea>
+
+        <div
+          class="text-danger mt-1"
+          *ngIf="form.get('content')?.touched && form.get('content')?.invalid"
+        >
+          Comment is required (2-1000 chars).
+        </div>
+
+        <div class="text-end mt-2">
+          <button class="btn btn-primary" type="submit" [disabled]="saving">
+            {{ saving ? 'Posting...' : 'Add comment' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <ng-template #loginHint>
+    <div class="alert alert-info">
+      Please log in to add a comment.
+    </div>
+  </ng-template>
+
+  <ng-container *ngIf="!loading  && comments.length === 0">
+    <div class="no-comments text-center p-4 border rounded bg-light">
+      <div class="mb-2 fs-1">💬</div>
+      <p class="fw-semibold mb-1">No comments yet</p>
+      <p class="text-muted mb-0">
+        Be the first one to share your thoughts.
+      </p>
+    </div>
+  </ng-container>
+
+  <div class="list-group" *ngIf="!loading && !error && comments.length > 0">
+    <div class="list-group-item" *ngFor="let c of comments">
+      <div class="d-flex justify-content-between align-items-start">
+        <div>
+          <div class="fw-bold">{{ c.userName }}</div>
+          <div class="text-muted small">{{ formatDate(c.createdAt) }}</div>
+        </div>
+
+        <button
+          *ngIf="isAdmin"
+          class="btn btn-sm btn-outline-danger"
+          (click)="deleteComment(c.id)"
+          type="button"
+        >
+          Delete
+        </button>
+      </div>
+
+      <div class="mt-2">{{ c.content }}</div>
+    </div>
+  </div>
+</div>

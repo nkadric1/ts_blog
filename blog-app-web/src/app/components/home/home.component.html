@@ -1,11 +1,11 @@
-<div class="container pt-5">
-  <div class="row g-4">
+<div class="container page-wrap">
+
+  <div class="row g-4 mt-2">
     <div class="col-12 col-md-6 col-lg-4" *ngFor="let blog of blogPosts">
       <div class="card blog-card h-100">
-
-        <img 
+        <img
           [src]="apiBaseUrl + blog.featureImageUrl"
-          class="card-img-top"
+          class="blog-card-img"
           alt="Blog image"
         />
 
@@ -15,17 +15,15 @@
 
           <a
             [routerLink]="['/blog', blog.urlHandle]"
-            class="btn btn-primary mt-auto"
+            class="btn btn-primary mt-auto align-self-start"
           >
             Read More
           </a>
         </div>
-
       </div>
     </div>
   </div>
 
-  <!-- Pagination -->
   <div class="d-flex justify-content-between align-items-center mt-4">
     <button
       (click)="previousPage()"

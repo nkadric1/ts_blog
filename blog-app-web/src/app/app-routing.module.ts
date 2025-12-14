@@ -11,6 +11,8 @@ import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { AuthGuard } from './services/guard/auth.guard';
 import { EditBlogPostComponent } from './components/edit-blogpost/edit-blogpost.component';
+import { ProfileComponent } from './components/profile/profile.component';
+import { EditProfileComponent } from './components/profile/edit-profile/edit-profile.component';
 
 export const routes: Routes = [
   {
@@ -52,6 +54,8 @@ export const routes: Routes = [
     path: 'blog/:urlHandle',
     component: BlogpostDetailsComponent
   },
+  { path: 'profile', component: ProfileComponent /*, canActivate: [AuthGuard]*/ },
+    { path: 'profile/edit', component: EditProfileComponent },
   { path: '**', redirectTo: '', pathMatch: 'full' }
 ];
 

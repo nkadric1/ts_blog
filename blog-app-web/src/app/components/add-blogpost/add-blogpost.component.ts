@@ -122,25 +122,31 @@ export class AddBlogpostComponent implements OnInit {
     this.closeModal();
   }
 
-  createBlogPost(e: Event): void {
-    e.preventDefault();
-    this.blogPostService
-      .createBlogPost(this.blogPost)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(
-        (response: any) => {
-          if (response.statusCode === 201) {
-            alert('Blog post created successfully');
-            this.router.navigate(['/admin/blogposts']);
-          } else {
-            alert('Failed to create blog post');
-          }
-        },
-        (error) => {
-          alert('Error creating blog post');
-        }
-      );
-  }
+createBlogPost(): void {
+  const d = new Date(this.blogPost.publishDate as any);
+  this.blogPost.publishDate = new Date(Date.UTC(
+    d.getFullYear(),
+    d.getMonth(),
+    d.getDate()
+  )) as any;
+
+  this.blogPostService.createBlogPost(this.blogPost).subscribe({
+    next: (res) => {
+      if (res.status === 201 || res.status === 200) {
+        alert('Blog post created successfully');
+        this.router.navigate(['/admin/blogposts']);
+      } else {
+        alert('Created, but unexpected status: ' + res.status);
+      }
+    },
+    error: (err) => {
+      console.error(err);
+      alert(err?.error?.message ?? 'Error creating blog post');
+    }
+  });
+}
+
+
 
   ngOnDestroy(): void {
     this.destroy$.next();
@@ -153,17 +159,14 @@ export class AddBlogpostComponent implements OnInit {
     modalElement.setAttribute('aria-hidden', 'true');
     modalElement.style.display = 'none';
   
-    // Remove the backdrop element
     const backdrop = document.querySelector('.modal-backdrop');
     if (backdrop) {
       backdrop.remove();
     }
-  // Ensure the button is re-enabled and not affected by focus issues
   const uploadButton = document.querySelector('button[data-bs-target="#imageModal"]')  as HTMLElement;;
   if (uploadButton) {
-      uploadButton.blur(); // Blurring to prevent requiring a double-click
+      uploadButton.blur(); 
   }
-    // Remove the 'modal-open' class from the body to enable scrolling
     document.body.classList.remove('modal-open');
     document.documentElement.style.overflow= 'auto';
   }

@@ -1,49 +1,60 @@
-<div class="container pt-1">
-  <div class="main-section">
-    <h1>Category List</h1>
-  </div>
-  <div class="footer-section pt-3">
-    <button
-      type="button"
-      (click)="navigateToAddCategory()"
-      class="btn btn-primary"
-    >
-      Add Category
-    </button>
-  </div>
-  <div class="container mt-3 table-section">
-    <table class="table">
-      <thead>
-        <tr>
-          <th scope="col">Id</th>
-          <th scope="col">Name</th>
-          <th scope="col">URL Handle</th>
-          <th scope="col">{{ " " }}</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let category of categories">
-          <th scope="row">{{ category.id }}</th>
-          <td>{{ category.name }}</td>
-          <td>{{ category.urlHandle }}</td>
-          <td>
-            <button
-              class="btn btn-light"
-              type="button"
-              (click)="navigateToEditCategory(category.id)"
-            >
-              Edit</button
-            >{{ " " }}
-            <button
-              type="button"
-              class="btn btn-secondary"
-              (click)="deleteCategory(category.id)"
-            >
-              Delete
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+<div class="container page-wrap">
+  <div class="theme-surface admin-card p-3 p-md-4">
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+      <h2 class="page-title m-0">Categories</h2>
+
+      <button type="button" class="btn btn-primary" (click)="navigateToAddCategory()">
+        + Add category
+      </button>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table admin-table align-middle mb-0">
+        <thead class="admin-thead">
+          <tr>
+            <th>Name</th>
+            <th>URL handle</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let category of categories" class="admin-row">
+
+            <td class="fw-semibold">{{ category.name }}</td>
+
+            <td><span class="chip">{{ category.urlHandle }}</span></td>
+
+            <td class="text-end">
+              <div class="d-inline-flex gap-2" style="white-space: nowrap;">
+                <button
+                  class="btn btn-outline-primary btn-sm"
+                  type="button"
+                  (click)="navigateToEditCategory(category.id)"
+                >
+                  Edit
+                </button>
+
+                <button
+                  type="button"
+                  class="btn btn-outline-danger btn-sm"
+                  (click)="deleteCategory(category.id)"
+                >
+                  Delete
+                </button>
+              </div>
+            </td>
+          </tr>
+
+          <tr *ngIf="categories.length === 0">
+            <td colspan="4" class="text-center text-muted py-4">
+              No categories yet.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
   </div>
 </div>

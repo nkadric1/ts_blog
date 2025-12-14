@@ -9,21 +9,28 @@ import { environment } from 'src/environments/environment.staging';
   providedIn: 'root',
 })
 export class BlogpostsService {
-  private apiUrl: string = environment.apiUrl;
+ 
 
   constructor(private http: HttpClient) {}
 
-  getBlogPosts(page: number = 1): Observable<BlogPostListResponse> {
-    return this.http.get<BlogPostListResponse>(
-      `${this.apiUrl}/BlogPost?page=${page}`
-    );
-  }
+  private apiUrl = environment.apiUrl;
 
-  getVisibleBlogPosts(page: number = 1): Observable<BlogPostListResponse> {
-    return this.http.get<BlogPostListResponse>(
-      `${this.apiUrl}/BlogPost/Visible?page=${page}`
-    );
-  }
+
+createBlogPost(model: BlogPostCreate) {
+  return this.http.post(`${this.apiUrl}/BlogPost`, model, { observe: 'response' });
+}
+
+getBlogPosts(page = 1) {
+  return this.http.get(`${this.apiUrl}/BlogPost?page=${page}`);
+}
+
+getVisibleBlogPosts(page = 1) {
+  return this.http.get(`${this.apiUrl}/BlogPost/Visible?page=${page}`);
+}
+
+deleteBlogPost(id: string) {
+  return this.http.delete(`${this.apiUrl}/BlogPost/${id}`);
+}
 
   getBlogPost(id: string): Observable<BlogPost> {
     return this.http.get<BlogPost>(`${this.apiUrl}/BlogPost/${id}`);
@@ -33,15 +40,9 @@ export class BlogpostsService {
     return this.http.get<BlogPost>(`${this.apiUrl}/BlogPost/${urlHandle}`);
   }
 
-  createBlogPost(blogpost: BlogPostCreate): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/BlogPost`, blogpost);
-  }
 
   editBlogPost(id: string, blogpost: EditBlogPostRequest): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/BlogPost/${id}`, blogpost);
+  return this.http.put(`${this.apiUrl}/BlogPost/${id}`, blogpost);
   }
 
-  deleteBlogPost(id: string): Observable<any> {
-    return this.http.delete<any>(`${this.apiUrl}/BlogPost/${id}`);
-  }
 }

@@ -1,237 +1,176 @@
-<div class="container pt-1 mb-3">
-  <h1>Add Blog Post</h1>
-  <form (ngSubmit)="createBlogPost($event)" class="mt-4">
-    <div class="form-group">
-      <label class="pb-2" for="title">Title</label>
-      <input
-        type="text"
-        class="form-control"
-        id="title"
-        name="title"
-        [(ngModel)]="blogPost.title"
-        required
-      />
+<div class="container page-wrap">
+  <div class="form-shell theme-surface p-3 p-md-4">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+      <div>
+        <h1 class="page-title m-0">Add blog post</h1>
+        <div class="text-muted small">Write, preview and publish your post.</div>
+      </div>
+
+      <button type="submit" form="blogPostForm" class="btn btn-primary">
+        Save
+      </button>
     </div>
 
-    <div class="form-group mt-3">
-      <label class="pb-2" for="shortDescription">Short Description</label>
-      <input
-        type="text"
-        class="form-control"
-        id="shortDescription"
-        name="shortDescription"
-        [(ngModel)]="blogPost.shortDescription"
-        required
-      />
-    </div>
-
-    <div class="row">
-      <div class="col-md-6">
-        <div class="form-group mt-3">
-          <label class="pb-2" for="content">Content</label>
-          <textarea
+    <form id="blogPostForm" (ngSubmit)="createBlogPost()">
+      <div class="row g-3">
+        <div class="col-12 col-lg-6">
+          <label class="form-label" for="title">Title</label>
+          <input
             type="text"
-            class="form-control"
+            class="form-control app-input"
+            id="title"
+            name="title"
+            [(ngModel)]="blogPost.title"
+            placeholder="e.g. How to study effectively"
+            required
+          />
+        </div>
+
+        <div class="col-12 col-lg-6">
+          <label class="form-label" for="urlHandle">URL handle</label>
+          <input
+            type="text"
+            class="form-control app-input"
+            id="urlHandle"
+            name="urlHandle"
+            [(ngModel)]="blogPost.urlHandle"
+            placeholder="e.g. effective-study"
+            required
+          />
+          <div class="form-hint">This becomes the page URL.</div>
+        </div>
+
+        <div class="col-12">
+          <label class="form-label" for="shortDescription">Short description</label>
+          <input
+            type="text"
+            class="form-control app-input"
+            id="shortDescription"
+            name="shortDescription"
+            [(ngModel)]="blogPost.shortDescription"
+            placeholder="A quick summary shown on the home page..."
+            required
+          />
+        </div>
+
+        <!-- Content + Preview -->
+        <div class="col-12 col-lg-6">
+          <label class="form-label" for="content">Content (Markdown)</label>
+          <textarea
+            class="form-control app-input"
             id="content"
             name="content"
-            rows="15"
+            rows="16"
             required
             [(ngModel)]="blogPost.content"
+            placeholder="Write your post in Markdown..."
           ></textarea>
         </div>
-      </div>
 
-      <div class="col-md-6">
-        <div class="form-group mt-3">
-          <label class="pb-2" for="preview">Preview</label>
-          <div
-            id="preview"
-            class="form-control"
-            style="height: 373px; overflow-y: auto; background-color: #f9f9f9"
-          >
+        <div class="col-12 col-lg-6">
+          <label class="form-label" for="preview">Preview</label>
+          <div id="preview" class="preview-box">
             <markdown [data]="blogPost.content"></markdown>
+
+            <div *ngIf="!blogPost.content || blogPost.content.trim().length === 0" class="text-muted">
+              Start typing to see preview...
+            </div>
           </div>
         </div>
-      </div>
-    </div>
 
-    <div class="mb-3">
-      <label for="featuredImageUrl" class="form-label"
-        >Featured Image URL</label
-      >
-      <button
-        type="button"
-        class="btn btn-primary m-3"
-        data-bs-toggle="modal"
-        data-bs-target="#imageModal"
-      >
-        Upload Image
-      </button>
-      <input
-        type="text"
-        class="form-control"
-        id="featuredImageUrl"
-        [(ngModel)]="blogPost.featureImageUrl"
-        name="featuredImageUrl"
-      />
-    </div>
-    <div *ngIf="blogPost.featureImageUrl" class="mb-3">
-      <div class="images-preview">
-        <img
-          src="{{ blogPost.featureImageUrl }}"
-          alt="Featured Image Preview"
-          class="img-fluid image-preview"
-        />
-      </div>
-    </div>
+        <!-- Image -->
+        <div class="col-12">
+          <div class="d-flex flex-wrap align-items-end justify-content-between gap-2">
+            <div class="flex-grow-1" style="min-width: 260px;">
+              <label for="featuredImageUrl" class="form-label">Featured image URL</label>
+              <input
+                type="text"
+                class="form-control app-input"
+                id="featuredImageUrl"
+                [(ngModel)]="blogPost.featureImageUrl"
+                name="featuredImageUrl"
+                placeholder="Paste URL or choose from uploads..."
+              />
+              <div class="form-hint">This is used as the main blog image.</div>
+            </div>
 
-    <div class="form-group mt-3">
-      <label class="pb-2" for="urlHandle">URL Handle</label>
-      <input
-        type="text"
-        class="form-control"
-        id="urlHandle"
-        name="urlHandle"
-        [(ngModel)]="blogPost.urlHandle"
-        required
-      />
-    </div>
+            <button
+              type="button"
+              class="btn btn-outline-primary"
+              data-bs-toggle="modal"
+              data-bs-target="#imageModal"
+            >
+              Choose / upload image
+            </button>
+          </div>
 
-    <div class="form-group mt-3">
-      <label class="pb-2" for="publishDate">Publish Date</label>
-      <input
-        type="date"
-        class="form-control"
-        id="publishDate"
-        name="publishDate"
-        [(ngModel)]="blogPost.publishDate"
-        required
-      />
-    </div>
+          <div *ngIf="blogPost.featureImageUrl" class="image-inline-preview mt-3">
+            <img
+              [src]="blogPost.featureImageUrl"
+              alt="Featured image preview"
+            />
+          </div>
+        </div>
 
-    <div class="form-group mt-3">
-      <label class="pb-2" for="author">Author</label>
-      <input
-        type="text"
-        class="form-control"
-        id="author"
-        name="author"
-        [(ngModel)]="blogPost.author"
-        required
-      />
-    </div>
+        <!-- Meta -->
+        <div class="col-12 col-md-4">
+          <label class="form-label" for="publishDate">Publish date</label>
+          <input
+            type="date"
+            class="form-control app-input"
+            id="publishDate"
+            name="publishDate"
+            [(ngModel)]="blogPost.publishDate"
+            required
+          />
+        </div>
 
-    <div class="form-check mt-3">
-      <input
-        class="form-check-input"
-        type="checkbox"
-        id="isVisible"
-        name="isVisible"
-        [(ngModel)]="blogPost.isVisible"
-      />
-      <label class="form-check-label" for="flexCheckDefault">
-        Is Visible
-      </label>
-    </div>
+        <div class="col-12 col-md-4">
+          <label class="form-label" for="author">Author</label>
+          <input
+            type="text"
+            class="form-control app-input"
+            id="author"
+            name="author"
+            [(ngModel)]="blogPost.author"
+            required
+          />
+        </div>
 
-    <div class="form-group mt-3">
-      <label class="pb-2" for="categories">Categories</label>
-      <select
-        class="form-select"
-        multiple
-        aria-label="Default select example"
-        id="categories"
-        (change)="onCategoryChange($event)"
-      >
-        <option *ngFor="let category of categories" [value]="category.id">
-          {{ category.name }}
-        </option>
-      </select>
-    </div>
+        <div class="col-12 col-md-4 d-flex align-items-end">
+          <div class="form-check app-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              id="isVisible"
+              name="isVisible"
+              [(ngModel)]="blogPost.isVisible"
+            />
+            <label class="form-check-label" for="isVisible">Visible</label>
+          </div>
+        </div>
 
-    <div class="form-group">
-      <button type="submit" class="btn btn-primary mt-3">Save</button>
-    </div>
-  </form>
-</div>
-<div
-  #imageModal
-  class="modal fade"
-  id="imageModal"
-  tabindex="-2"
-  role="dialog"
-  aria-labelledby="imageModalLabel"
-  aria-hidden="true"
->
-  <div class="modal-dialog modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="imageModalLabel">Images</h5>
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal"
-          aria-label="Close"
-        ></button>
-      </div>
-      <div class="modal-body">
-        <div class="row image-grid">
-          <div
-            class="col-md-3 col-sm-6 mb-3"
-            *ngFor="let image of blogImages$ | async"
+        <div class="col-12">
+          <label class="form-label" for="categories">Categories</label>
+          <select
+            class="form-select app-input"
+            multiple
+            id="categories"
+            (change)="onCategoryChange($event)"
           >
-            <div class="card">
-              <img
-                (click)="onImageClick(image.url)"
-                [src]="image.url"
-                [alt]="image.title"
-                class="card-img-top hover-image"
-              />
-              <div class="card-body">
-                <p class="card-text">{{ image.title }}</p>
-              </div>
-            </div>
-          </div>
+            <option *ngFor="let category of categories" [value]="category.id">
+              {{ category.name }}
+            </option>
+          </select>
+          <div class="form-hint">Hold Ctrl/Cmd to select multiple.</div>
         </div>
 
-        <div class="upload-section">
-          <h5>Upload Image</h5>
-          <form (ngSubmit)="SubmitImageForm()">
-            <div class="mb-3">
-              <label for="fileInput" class="form-label">Choose File</label>
-              <input
-                type="file"
-                (change)="onFileSelected($event)"
-                class="form-control"
-                id="fileInput"
-              />
-            </div>
-            <div class="mb-3">
-              <label for="fileName" class="form-label">File Name</label>
-              <input
-                type="text"
-                class="form-control"
-                [(ngModel)]="fileName"
-                id="fileName"
-                name="fileName"
-                placeholder="File Name"
-              />
-            </div>
-            <div class="mb-3">
-              <label for="imageTitle" class="form-label">Title</label>
-              <input
-                type="text"
-                class="form-control"
-                [(ngModel)]="title"
-                id="imageTitle"
-                name="imageTitle"
-                placeholder="Title"
-              />
-            </div>
-            <button type="submit" class="btn btn-dark w-100">Upload</button>
-          </form>
+        <div class="col-12 d-flex justify-content-end gap-2 mt-2">
+          <button type="submit" class="btn btn-primary">
+            Save
+          </button>
         </div>
       </div>
-    </div>
+    </form>
   </div>
 </div>

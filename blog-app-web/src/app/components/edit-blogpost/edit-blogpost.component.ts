@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, Subscription } from 'rxjs';
 import { BlogImagePost } from 'src/app/models/blog-image-post.model';
 import { BlogPost } from 'src/app/models/blogposts.model';
-import {  Category } from 'src/app/models/categories.model';
+import { Category } from 'src/app/models/categories.model';
 import { EditBlogPostRequest } from 'src/app/models/edit-blog-post-request.model';
 import { BlogImagesService } from 'src/app/services/blog-images/blog-images.service';
 import { BlogpostsService } from 'src/app/services/blogposts/blogposts.service';
@@ -17,42 +17,51 @@ import { CategoriesService } from 'src/app/services/categories/categories.servic
 export class EditBlogPostComponent implements OnInit, OnDestroy {
   id: string = '';
   blogPost?: BlogPost;
-  categories: Category[] = []; 
-  selectedCategories: string[] = []; 
+
+  categories: Category[] = [];
+  selectedCategories: string[] = [];
+
   paramsSubscription?: Subscription;
   updateBlogPostSubscription?: Subscription;
   private uploadSubscription?: Subscription;
+
   markdownContent: string = '';
   blogImages$!: Observable<Array<BlogImagePost>>;
+
   selectedFile: File | null = null;
   fileName: string = '';
   title: string = '';
+declare  bootstrap: any;
 
   @ViewChild('imageModal') imageModal!: ElementRef;
 
   constructor(
     private route: ActivatedRoute,
     private blogPostService: BlogpostsService,
-    private categoryService: CategoriesService, 
+    private categoryService: CategoriesService,
     private blogImageService: BlogImagesService,
     private router: Router
   ) {}
 
   ngOnInit(): void {
+    this.blogImages$ = this.blogImageService.getBlogImages();
+    this.loadCategories();
+
     this.paramsSubscription = this.route.paramMap.subscribe(params => {
       this.id = params.get('id') ?? '';
-      this.fetchBlogPost(this.id);
-      this.loadCategories();
-      
+      if (this.id) this.fetchBlogPost(this.id);
     });
-    this.blogImages$ = this.blogImageService.getBlogImages();
   }
 
   private fetchBlogPost(id: string): void {
     this.blogPostService.getBlogPost(id).subscribe(res => {
       this.blogPost = res;
-      this.markdownContent = this.blogPost.content;
-      this.selectedCategories = this.blogPost.categories.map(cat => cat.id);
+
+      this.markdownContent = this.blogPost.content ?? '';
+
+      this.selectedCategories = (this.blogPost.categories ?? []).map((c: any) => c.id ?? c);
+
+      this.blogPost.featureImageUrl = this.toRelativeUrl(this.blogPost.featureImageUrl);
     });
   }
 
@@ -62,94 +71,104 @@ export class EditBlogPostComponent implements OnInit, OnDestroy {
     });
   }
 
-  onFormSubmit(): void {
-    if (this.blogPost) {
-      const request: EditBlogPostRequest = {
-        title: this.blogPost.title,
-        shortDescription: this.blogPost.shortDescription,
-        content: this.blogPost.content,
-        featureImageURL: this.blogPost.featureImageUrl,
-        urlHandle: this.blogPost.urlHandle,
-        publishDate: this.blogPost.publishDate,
-        author: this.blogPost.author,
-        isVisible: this.blogPost.isVisible,
-        categories: this.selectedCategories
-      };
+  updateMarkdown(content: string): void {
+    this.markdownContent = content;
+  }
 
-      this.updateBlogPostSubscription = this.blogPostService.editBlogPost(this.id, request).subscribe(() => {
-        this.router.navigateByUrl('/admin/blogposts');
+  onFormSubmit(): void {
+    if (!this.blogPost) return;
+
+    const d = new Date(this.blogPost.publishDate as any);
+    const publishUtc = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+
+    const request: EditBlogPostRequest = {
+      title: this.blogPost.title,
+      shortDescription: this.blogPost.shortDescription,
+      content: this.blogPost.content,
+
+      featureImageUrl: this.toRelativeUrl(this.blogPost.featureImageUrl),
+
+      urlHandle: this.blogPost.urlHandle,
+      publishDate: publishUtc as any,
+      author: this.blogPost.author,
+      isVisible: this.blogPost.isVisible,
+
+      categories: this.selectedCategories
+    };
+
+    this.updateBlogPostSubscription = this.blogPostService
+      .editBlogPost(this.id, request)
+      .subscribe({
+        next: () => this.router.navigateByUrl('/admin/blogposts'),
+        error: (err) => {
+          console.error(err);
+          alert(err?.error?.message ?? 'Error updating blog post');
+        }
       });
+  }
+
+  SubmitImageForm(): void {
+    if (!this.selectedFile || !this.fileName || !this.title) {
+      window.alert('File, file name, or title is missing.');
+      return;
+    }
+
+    this.uploadSubscription = this.blogImageService
+      .uploadImage(this.selectedFile, this.fileName, this.title)
+      .subscribe({
+        next: (response: any) => {
+          const raw = response?.filePath ?? response?.url ?? '';
+          if (!raw) {
+            console.error('Upload response does not contain filePath/url:', response);
+            return;
+          }
+
+          if (this.blogPost) this.blogPost.featureImageUrl = this.toRelativeUrl(raw);
+          this.blogImages$ = this.blogImageService.getBlogImages();
+          this.closeModal();
+        },
+        error: (error) => {
+          console.error('Error uploading image:', error);
+          window.alert('Use .png, .jpg or .jpeg!');
+        }
+      });
+  }
+
+  onFileSelected(event: any): void {
+    const file = event?.target?.files?.[0];
+    if (file) this.selectedFile = file;
+  }
+
+  onImageClick(url: string | undefined): void {
+    if (!this.blogPost) return;
+    this.blogPost.featureImageUrl = this.toRelativeUrl(url ?? '');
+    this.closeModal();
+  }
+
+  private toRelativeUrl(url: string): string {
+    if (!url) return '';
+    if (url.startsWith('/')) return url;
+
+    try {
+      const u = new URL(url);
+      return u.pathname;
+    } catch {
+      return url;
     }
   }
 
+private closeModal(): void {
+  const el = this.imageModal?.nativeElement as HTMLElement;
+  if (!el) return;
+
+  (document.activeElement as HTMLElement | null)?.blur();
+
+  const instance = this.bootstrap.Modal.getInstance(el) || new this.bootstrap.Modal(el);
+  instance.hide();
+}
   ngOnDestroy(): void {
     this.paramsSubscription?.unsubscribe();
     this.updateBlogPostSubscription?.unsubscribe();
     this.uploadSubscription?.unsubscribe();
   }
-
-  updateMarkdown(content: string): void {
-    this.markdownContent = content;
-  }
-
-  SubmitImageForm(): void {
-    if (this.selectedFile && this.fileName && this.title) {
-      this.uploadSubscription = this.blogImageService.uploadImage(this.selectedFile, this.fileName, this.title)
-        .subscribe({
-          next: (response) => {
-            if (response && response.filePath) {
-              this.blogPost!.featureImageUrl = response.filePath;
-              this.blogImages$ = this.blogImageService.getBlogImages();
-              this.closeModal();
-            } else {
-              console.error('Upload response does not contain filePath:', response);
-            }
-          },
-          error: (error) => {
-            console.error('Error uploading image:', error);
-            window.alert('Use an image with an extension that is either .png, .jpg, or .jpeg!');
-          }
-        });
-    } else {
-      window.alert('File, file name, or title is missing.');
-    }
-  }
-
-  onFileSelected(event: any): void {
-    const file = event.target.files[0];
-    if (file) {
-      this.selectedFile = file;
-    }
-  }
-
-  onImageClick(url: string | undefined): void {
-    this.blogPost!.featureImageUrl = url ?? '';
-    this.closeModal();
-  }
-
-  private closeModal(): void {
-    if (this.imageModal && this.imageModal.nativeElement) {
-      const modalElement = this.imageModal.nativeElement;
-      modalElement.classList.remove('show');
-      modalElement.setAttribute('aria-hidden', 'true');
-      modalElement.style.display = 'none';
-
-      // Remove the backdrop element
-      const backdrop = document.querySelector('.modal-backdrop');
-      if (backdrop) {
-        backdrop.remove();
-      }
-
-      // Ensure the button is re-enabled and not affected by focus issues
-      const uploadButton = document.querySelector('button[data-bs-target="#imageModal"]') as HTMLElement;
-      if (uploadButton) {
-        uploadButton.blur(); // Blurring to prevent requiring a double-click
-      }
-
-      // Remove the 'modal-open' class from the body to enable scrolling
-      document.body.classList.remove('modal-open');
-      document.documentElement.style.overflow = 'auto';
-    }
-  }
 }
-

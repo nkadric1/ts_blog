@@ -5,6 +5,8 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
+using BlogAppAPI.Data;
 
 namespace BlogAppAPI.Repositories
 {
@@ -14,12 +16,14 @@ namespace BlogAppAPI.Repositories
         private readonly UserManager<ApplicationUser> _userManager; // Provided function by ASP.NET for user management operations.
         private readonly IConfiguration _configuration; // For appsettings.json access.
         private readonly SignInManager<ApplicationUser> _signInManager; // For sign in management operations.
+        private readonly ApplicationDbContext _appDbContext;
 
-        public AuthRepository(UserManager<ApplicationUser> userManager, IConfiguration configuration, SignInManager<ApplicationUser> signInManager)
+        public AuthRepository(UserManager<ApplicationUser> userManager, IConfiguration configuration, SignInManager<ApplicationUser> signInManager, ApplicationDbContext appDbContext)
         {
             _userManager = userManager;
             _configuration = configuration;
             _signInManager = signInManager;
+            _appDbContext=appDbContext;
         }
 
         public async Task<ApplicationUser> LoginAsync(string username, string password)
@@ -113,5 +117,18 @@ namespace BlogAppAPI.Repositories
                 Created = DateTime.UtcNow
             };
         }
+
+        public async Task<ApplicationUser> GetUserById(string id)
+        {
+            return await _appDbContext.Users.FirstOrDefaultAsync(u => u.Id == id);
+        }
+
+        public async Task<ApplicationUser> UpdateUser(ApplicationUser user)
+        {
+            _appDbContext.Users.Update(user);
+            await _appDbContext.SaveChangesAsync();
+            return user;
+        }
+
     }
 }

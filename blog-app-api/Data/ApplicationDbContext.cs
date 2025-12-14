@@ -2,10 +2,11 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using BlogAppAPI.Models.Domain;
 
 namespace BlogAppAPI.Data
 {
-    public class ApplicationDbContext : IdentityDbContext<IdentityUser> 
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser> 
     { 
         public DbSet<Category> Categories { get; set; }
         public DbSet<BlogPost> BlogPosts { get; set; }

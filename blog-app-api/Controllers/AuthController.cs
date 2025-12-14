@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace BlogAppAPI.Controllers
 {
@@ -90,7 +91,9 @@ namespace BlogAppAPI.Controllers
             if (storedToken == null || !storedToken.IsActive)
                 return Unauthorized("Invalid refresh token");
 
-            var user = await _userManager.FindByIdAsync(storedToken.UserId);
+            var user = await _userManager.Users
+                .FirstOrDefaultAsync(u => u.Id == storedToken.UserId);
+
             if (user == null)
                 return Unauthorized();
 
@@ -128,6 +131,45 @@ namespace BlogAppAPI.Controllers
             return Ok("Logged out.");
         }
 
+        [HttpGet("profile")]
+        public async Task<IActionResult> GetProfile()
+        {
+            var userId = User.FindFirstValue("id");
+
+            var user = await _authRepository.GetUserById(userId);
+
+            if (user == null) return NotFound();
+
+            var dto = new UserProfileDto
+            {
+                Id = user.Id,
+                Email = user.Email,
+                FullName = user.FullName,
+                Bio = user.Bio,
+                ProfileImageUrl = user.ProfileImageUrl
+            };
+
+            return Ok(dto);
+        }
+
+        [HttpPut("profile")]
+        [Authorize]
+        public async Task<IActionResult> UpdateProfile([FromBody] UpdateUserProfileDto model)
+        {
+            var userId = User.FindFirstValue("id");
+            var user = await _authRepository.GetUserById(userId);
+
+            if (user == null)
+                return NotFound();
+
+            user.FullName = model.FullName;
+            user.Bio = model.Bio;
+            user.ProfileImageUrl = model.ProfileImageUrl;
+
+            await _authRepository.UpdateUser(user);
+
+            return Ok(new { message = "Profile updated successfully" });
+        }
 
         //helper method
         private void SetRefreshTokenCookie(RefreshToken token)

@@ -9,6 +9,7 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 // --------------------------------------------------
@@ -52,10 +53,13 @@ builder.Services.AddSwaggerGen(c =>
 // --------------------------------------------------
 // 2?? Database konekcija
 // --------------------------------------------------
+// builder.Services.AddDbContext<ApplicationDbContext>(options =>
+// {
+//     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+// });
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-{
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-});
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 
 // --------------------------------------------------
 // 3?? Identity i korisnici
@@ -70,6 +74,7 @@ builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IBlogRepository, BlogRepository>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IBlogImageRepository, BlogImageRepository>();
+builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 
 // --------------------------------------------------
 // 5?? JWT Autentikacija
@@ -138,12 +143,21 @@ using (var scope = app.Services.CreateScope())
         }
     }
 
-    var adminUser = new ApplicationUser
-    {
-        UserName = "admin",
-        Email = "admin@example.com",
-        EmailConfirmed = true
-    };
+    // var adminUser = new ApplicationUser
+    // {
+    //     UserName = "admin",
+    //     Email = "admin@example.com",
+    //     EmailConfirmed = true
+    // };
+var adminUser = new ApplicationUser
+{
+    UserName = "admin",
+    Email = "admin@example.com",
+    EmailConfirmed = true,
+    FullName = "Admin User",
+    Bio = "System Administrator",
+    ProfileImageUrl = "default.png"
+};
 
     var existingAdmin = await userManager.FindByNameAsync(adminUser.UserName);
 

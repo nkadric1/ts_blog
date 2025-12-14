@@ -4,7 +4,7 @@ export interface EditBlogPostRequest {
     title: string;
     shortDescription: string;
     content: string;
-    featureImageURL: string;
+    featureImageUrl: string;
     urlHandle: string;
     publishDate: Date;
     author: string;

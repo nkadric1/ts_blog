@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
@@ -19,6 +19,8 @@ import { AuthInterceptor } from './interceptors/auth.service';
 import { RegisterComponent } from './register/register.component';
 import { EditBlogPostComponent } from './components/edit-blogpost/edit-blogpost.component';
 import { CommentsComponent } from './components/comments/comments.component';
+import { ProfileComponent } from './components/profile/profile.component';
+import { EditProfileComponent } from './components/profile/edit-profile/edit-profile.component';
 
 @NgModule({
   declarations: [
@@ -34,14 +36,17 @@ import { CommentsComponent } from './components/comments/comments.component';
     LoginComponent,
     RegisterComponent,
     EditBlogPostComponent,
-    CommentsComponent
+    CommentsComponent,
+    ProfileComponent,
+    EditProfileComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     FormsModule,
     HttpClientModule,
-    MarkdownModule.forRoot()
+    MarkdownModule.forRoot(),
+    ReactiveFormsModule
   ],
   providers: [
     {
