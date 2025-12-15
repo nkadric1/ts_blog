@@ -3,21 +3,20 @@ using BlogAppAPI.Models.Domain;
 using BlogAppAPI.Repositories;
 using BlogAppAPI.Repositories.Interface;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
 // --------------------------------------------------
-// 1?? Default ASP.NET konfiguracija
+// 1️⃣ Default ASP.NET konfiguracija
 // --------------------------------------------------
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-
 
 builder.Services.AddSwaggerGen(c =>
 {
@@ -49,26 +48,21 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-
 // --------------------------------------------------
-// 2?? Database konekcija
+// 2️⃣ Database konekcija
 // --------------------------------------------------
-// builder.Services.AddDbContext<ApplicationDbContext>(options =>
-// {
-//     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-// });
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-
 // --------------------------------------------------
-// 3?? Identity i korisnici
+// 3️⃣ Identity
 // --------------------------------------------------
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
+
 // --------------------------------------------------
-// 4?? Repozitoriji
+// 4️⃣ Repozitoriji
 // --------------------------------------------------
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IBlogRepository, BlogRepository>();
@@ -78,7 +72,7 @@ builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 // --------------------------------------------------
-// 5?? JWT Autentikacija
+// 5️⃣ JWT autentikacija
 // --------------------------------------------------
 builder.Services.AddAuthentication(options =>
 {
@@ -103,31 +97,40 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddAuthorization();
 
 // --------------------------------------------------
-// 6?? CORS (dozvoli sve za testiranje lokalno)
+// 6️⃣ CORS (Frontend + lokalni dev)
 // --------------------------------------------------
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-       policy.WithOrigins(
-        "https://localhost:4200",
-        "https://main.d1ahgoahd4te6v.amplifyapp.com"
-      )
-      .AllowAnyHeader()
-      .AllowAnyMethod()
-      .AllowCredentials();
-
+        policy
+            .WithOrigins(
+                "https://localhost:4200",
+                "https://main.d1ahgoahd4te6v.amplifyapp.com"
+            )
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
     });
 });
 
+// --------------------------------------------------
+// 7️⃣ Forwarded headers (NGINX + HTTPS)
+// --------------------------------------------------
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders =
+        ForwardedHeaders.XForwardedFor |
+        ForwardedHeaders.XForwardedProto;
+});
 
 // --------------------------------------------------
-// 7?? Build aplikacije
+// 8️⃣ Build aplikacije
 // --------------------------------------------------
 var app = builder.Build();
 
 // --------------------------------------------------
-// 8?? Seed podataka (role i admin korisnik)
+// 9️⃣ Seed (role + admin)
 // --------------------------------------------------
 using (var scope = app.Services.CreateScope())
 {
@@ -148,21 +151,15 @@ using (var scope = app.Services.CreateScope())
         }
     }
 
-    // var adminUser = new ApplicationUser
-    // {
-    //     UserName = "admin",
-    //     Email = "admin@example.com",
-    //     EmailConfirmed = true
-    // };
-var adminUser = new ApplicationUser
-{
-    UserName = "admin",
-    Email = "admin@example.com",
-    EmailConfirmed = true,
-    FullName = "Admin User",
-    Bio = "System Administrator",
-    ProfileImageUrl = "default.png"
-};
+    var adminUser = new ApplicationUser
+    {
+        UserName = "admin",
+        Email = "admin@example.com",
+        EmailConfirmed = true,
+        FullName = "Admin User",
+        Bio = "System Administrator",
+        ProfileImageUrl = "default.png"
+    };
 
     var existingAdmin = await userManager.FindByNameAsync(adminUser.UserName);
 
@@ -173,7 +170,6 @@ var adminUser = new ApplicationUser
     }
     else
     {
-        // ensure the user has Admin role if already exists
         if (!await userManager.IsInRoleAsync(existingAdmin, "Admin"))
         {
             await userManager.AddToRoleAsync(existingAdmin, "Admin");
@@ -182,9 +178,11 @@ var adminUser = new ApplicationUser
 }
 
 // --------------------------------------------------
-// 9?? Middleware pipeline
+// 🔟 Middleware pipeline (REDOSLIJED JE BITAN)
 // --------------------------------------------------
-app.UseCors("AllowFrontend");   // MUST be before auth
+app.UseCors("AllowFrontend");
+
+app.UseForwardedHeaders();
 
 if (app.Environment.IsDevelopment())
 {
@@ -197,7 +195,8 @@ app.UseStaticFiles(new StaticFileOptions
     FileProvider = new PhysicalFileProvider(
         Path.Combine(builder.Environment.ContentRootPath, "wwwroot")),
     RequestPath = ""
-}); 
+});
+
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
