@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { BlogPost, BlogPostCreate } from 'src/app/models/blogposts.model';
 import { EditBlogPostRequest } from 'src/app/models/edit-blog-post-request.model';
-import { environment } from 'src/environments/environment.staging';
+import { environment } from 'src/environments/environment';
 import { AuthService } from '../auth/auth.service';
 
 @Injectable({

@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { BlogPost } from 'src/app/models/blogposts.model';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { BlogpostsService } from 'src/app/services/blogposts/blogposts.service';
-import { environment } from 'src/environments/environment.staging';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-blogpost-details',

@@ -109,10 +109,14 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("https://localhost:4200")  // Angular app
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials();   // REQUIRED for refreshToken cookie
+       policy.WithOrigins(
+        "https://localhost:4200",
+        "https://main.d1ahgoahd4te6v.amplifyapp.com"
+      )
+      .AllowAnyHeader()
+      .AllowAnyMethod()
+      .AllowCredentials();
+
     });
 });
 

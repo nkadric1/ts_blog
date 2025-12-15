@@ -8,7 +8,7 @@ import { EditBlogPostRequest } from 'src/app/models/edit-blog-post-request.model
 import { BlogImagesService } from 'src/app/services/blog-images/blog-images.service';
 import { BlogpostsService } from 'src/app/services/blogposts/blogposts.service';
 import { CategoriesService } from 'src/app/services/categories/categories.service';
-import { environment } from 'src/environments/environment.staging';
+import { environment } from 'src/environments/environment';
 
 declare const bootstrap: any;
 

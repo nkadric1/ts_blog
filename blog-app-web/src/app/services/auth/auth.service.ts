@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { environment } from 'src/environments/environment.staging';
 import { jwtDecode } from 'jwt-decode';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -13,16 +13,21 @@ export class AuthService {
 
   constructor(private http: HttpClient) {}
 
-  login(username: string, password: string): Observable<any> {
-    return this.http
-      .post<any>(`${this.apiUrl}/Auth/Login`, { username, password })
-      .pipe(
-        tap((response: any) => {
-          const token = response.token;
-          this.storeTokenWithRealExpiration(token);
-        })
-      );
-  }
+login(username: string, password: string): Observable<any> {
+  return this.http
+    .post<any>(
+      `${this.apiUrl}/Auth/Login`,
+      { username, password },
+      { withCredentials: true }
+    )
+    .pipe(
+      tap((response: any) => {
+        const token = response.token;
+        this.storeTokenWithRealExpiration(token);
+      })
+    );
+}
+
 
   logout(): Observable<any> {
     this.deleteCookie('jwtToken');
@@ -36,7 +41,11 @@ export class AuthService {
   }
 
 register(data: any): Observable<any> {
-  return this.http.post(`${this.apiUrl}/Auth/Register`, data);
+  return this.http.post(
+    `${this.apiUrl}/Auth/Register`,
+    data,
+    { withCredentials: true }
+  );
 }
 
 
@@ -89,10 +98,14 @@ register(data: any): Observable<any> {
     return found ? found.split('=')[1] : null;
   }
 
+  // private deleteCookie(name: string) {
+  //   document.cookie =
+  //     `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+  // }
   private deleteCookie(name: string) {
-    document.cookie =
-      `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-  }
+  document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Strict; Secure`;
+}
+
 
   refresh(): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/Auth/Refresh`, {}, { withCredentials: true });

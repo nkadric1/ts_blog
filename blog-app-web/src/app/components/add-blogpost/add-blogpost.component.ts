@@ -11,7 +11,7 @@ import { CategoriesService } from 'src/app/services/categories/categories.servic
 import { BlogImagesService } from 'src/app/services/blog-images/blog-images.service';
 import { AuthService } from 'src/app/services/auth/auth.service';
 
-import { environment } from 'src/environments/environment.staging';
+import { environment } from 'src/environments/environment';
 
 declare const bootstrap: any;
 

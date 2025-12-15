@@ -193,14 +193,15 @@ namespace BlogAppAPI.Controllers
 
 
 		private void SetRefreshTokenCookie(RefreshToken token)
-		{
-			Response.Cookies.Append("refreshToken", token.Token, new CookieOptions
-			{
-				HttpOnly = true,
-				Secure = true,
-				SameSite = SameSiteMode.Strict,
-				Expires = token.Expires
-			});
-		}
+        {
+            Response.Cookies.Append("refreshToken", token.Token, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.None, //none is must for amplify
+                Expires = token.Expires
+            });
+        }
+
 	}
 }

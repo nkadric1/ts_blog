@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from 'src/environments/environment.staging';
+import { environment } from 'src/environments/environment';
 import { UpdateUserProfile, UserProfile } from '../models/user-profile.model';
 import { AuthService } from './auth/auth.service';
 

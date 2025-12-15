@@ -4,7 +4,7 @@ import { Subject } from 'rxjs';
 import { BlogPost } from 'src/app/models/blogposts.model';
 import { BlogpostsService } from 'src/app/services/blogposts/blogposts.service';
 import { jwtDecode } from 'jwt-decode';
-import { environment } from 'src/environments/environment.staging';
+import { environment } from 'src/environments/environment';
 import { AuthService } from 'src/app/services/auth/auth.service'; // provjeri putanju
 
 type TabKey = 'all' | 'mine';
