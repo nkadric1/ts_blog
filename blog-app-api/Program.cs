@@ -146,6 +146,7 @@ var context = services.GetRequiredService<ApplicationDbContext>();
         }
     }
 }
+app.UseRouting();            
 
 app.UseCors("AllowFrontend");
 
