@@ -30,6 +30,7 @@ builder.Services.AddSwaggerGen(c =>
 	});
 
 	c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement{
+
 	{
 		new Microsoft.OpenApi.Models.OpenApiSecurityScheme
 		{
@@ -47,13 +48,9 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
-{
-	// (opciono) možeš pojačati/olakšati password pravila
-	// options.Password.RequiredLength = 8;
-})
-.AddEntityFrameworkStores<ApplicationDbContext>()
-.AddDefaultTokenProviders();
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
 
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IBlogRepository, BlogRepository>();
@@ -61,7 +58,6 @@ builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IBlogImageRepository, BlogImageRepository>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-
 
 builder.Services.AddAuthentication(options =>
 {
@@ -87,36 +83,24 @@ builder.Services.AddAuthorization();
 
 builder.Services.AddCors(options =>
 {
-	options.AddPolicy("AllowFrontend", policy =>
-	{
-		policy
-			.WithOrigins(
-				"https://main.d1cs4sdtdtvkzb.amplifyapp.com",
-				"http://localhost:4200",
-				"http://localhost:3000"
-			)
-			.AllowAnyHeader()
-			.AllowAnyMethod();
-		// JWT u Authorization headeru → AllowCredentials NE treba
-	});
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy
+            .WithOrigins("https://main.d1cs4sdtdtvkzb.amplifyapp.com")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
 });
 
-// --------------------------------------------------
-// 7) Forwarded headers (ako koristiš NGINX/reverse proxy)
-// --------------------------------------------------
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
-	options.ForwardedHeaders =
-	ForwardedHeaders.XForwardedFor |
-	ForwardedHeaders.XForwardedProto;
-
-// Ako znaš proxy IP/Networks, dodaj ovdje KnownProxies/KnownNetworks radi sigurnosti.
-// options.KnownProxies.Add(IPAddress.Parse("x.x.x.x"));
+    options.ForwardedHeaders =
+        ForwardedHeaders.XForwardedFor |
+        ForwardedHeaders.XForwardedProto;
 });
 
-
 var app = builder.Build();
-
 
 using (var scope = app.Services.CreateScope())
 {
@@ -128,14 +112,14 @@ var context = services.GetRequiredService<ApplicationDbContext>();
 
 	context.Database.Migrate();
 
-	var roles = new[] { "Admin", "User" };
-	foreach (var role in roles)
-	{
-		if (!await roleManager.RoleExistsAsync(role))
-		{
-			await roleManager.CreateAsync(new IdentityRole(role));
-		}
-	}
+    var roles = new[] { "Admin", "User" };
+    foreach (var role in roles)
+    {
+        if (!await roleManager.RoleExistsAsync(role))
+        {
+            await roleManager.CreateAsync(new IdentityRole(role));
+        }
+    }
 
 	var adminUser = new ApplicationUser
 	{
@@ -149,35 +133,38 @@ var context = services.GetRequiredService<ApplicationDbContext>();
 
 	var existingAdmin = await userManager.FindByNameAsync(adminUser.UserName);
 
-	if (existingAdmin == null)
-	{
-		await userManager.CreateAsync(adminUser, "Admin@123");
-		await userManager.AddToRoleAsync(adminUser, "Admin");
-	}
-	else
-	{
-		if (!await userManager.IsInRoleAsync(existingAdmin, "Admin"))
-		{
-			await userManager.AddToRoleAsync(existingAdmin, "Admin");
-		}
-	}
-
+    if (existingAdmin == null)
+    {
+        await userManager.CreateAsync(adminUser, "Admin@123");
+        await userManager.AddToRoleAsync(adminUser, "Admin");
+    }
+    else
+    {
+        if (!await userManager.IsInRoleAsync(existingAdmin, "Admin"))
+        {
+            await userManager.AddToRoleAsync(existingAdmin, "Admin");
+        }
+    }
 }
-
-app.UseForwardedHeaders();
-
-app.UseSwagger();
-app.UseSwaggerUI();
 
 app.UseCors("AllowFrontend");
 
+app.UseForwardedHeaders();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
 app.UseStaticFiles(new StaticFileOptions
 {
-	FileProvider = new PhysicalFileProvider(
-Path.Combine(builder.Environment.ContentRootPath, "wwwroot")),
-	RequestPath = ""
+    FileProvider = new PhysicalFileProvider(
+        Path.Combine(builder.Environment.ContentRootPath, "wwwroot")),
+    RequestPath = ""
 });
 
+//app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();

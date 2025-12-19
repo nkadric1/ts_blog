@@ -4,5 +4,5 @@
 // };
 export const environment = {
   production: true,
-  apiUrl: 'https://3.237.44.239/api'
+  apiUrl: 'https://blogappts.ddnsgeek.com/api'
 };
