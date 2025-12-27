@@ -43,7 +43,7 @@ export class BlogpostDetailsComponent implements OnInit {
       if (urlHandle) {
         this.getBlogPost(urlHandle);
       }
-      console.log(this.authService.getToken());
+     //console.log(this.authService.getToken());
 
     });
 
